@@ -1,0 +1,37 @@
+SMART HIRE - RESUME DATA
+========================================
+
+File: soumili_Dutta_CV.pdf
+Type: PDF
+
+CANDIDATE INFORMATION
+------------------------------
+name: Soumili
+email: soumilid05@gmail.com
+phone: +91 9907226988
+skills: ['Python', 'C', 'SQL', 'HTML', 'CSS', 'Data Science', 'Git', 'GitHub', 'MySQL', 'Power BI', 'Excel']
+education: ['B.Tech', 'Bachelor of Technology', 'Diploma', '10th']
+experience: BI, SQL, Python, and Data Visualization. Experienced in creating dashboards,
+analyzing datasets, and generating actionable business insights. Seeking
+opportunities to apply analytical and business intelligence skills in real-world
+projects.
+Certification(Internships) Python for Data Science
+TIU
+Data Analytics Simulation
+Deloitte
+GenAI Simulation
+TATA
+Education Basirhat H.M.D Girls’ High School Schooling (10th) • 79.14%
+2020
+Experience CEAT Ltd. Chennai
+Associate Trainee 08/2023 – 04/2024
+Analyzed operational data and prepared reports using Excel.
+Projects Business Intelligence Dashboard (Power BI, Excel)
+Created interactive dashboards to analyze business performance metrics.
+Developed KPI reports and visualizations for decision-making.
+Performed data cleaning, transformation, and analysis using Power BI.
+Student Management System (Python, MySQL)
+
+CLEANED RESUME TEXT
+------------------------------
+soumili soumilid05@gmail.com 91 9907226988 dighi road basirhat north 24 parganas west bengal 743422 http github com student soumili skill technical skill power bi sql mysql postgresql python excel data visualization data analysis dashboard development business intelligence data cleaning reporting analytics summary aspiring business intelligence analyst skill data analytics power bi sql python data visualization experienced creating dashboard analyzing datasets generating actionable business insight seeking opportunity apply analytical business intelligence skill real world project certification internship python data science tiu data analytics simulation deloitte genai simulation tata education basirhat h girl high school schooling 10th 79 14 2020 central calcutta polytechnic diploma electronics engineering 80 4 2020 2023 techno india university bachelor technology b tech computer science engineering cgpa 8 1 expected graduation 07 2027 language english bengali hindi experience ceat ltd chennai associate trainee 08 2023 04 2024 analyzed operational data prepared report using excel project business intelligence dashboard power bi excel created interactive dashboard analyze business performance metric developed kpi report visualization decision making performed data cleaning transformation analysis using power bi student management system python mysql developed system manage student record crud operation database integration dynamic portfolio website html cs jsp servlet jdbc designed responsive personal portfolio showcasing skill project also added deleted dynamically

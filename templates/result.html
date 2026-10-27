@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101936">
+    <meta name="description" content="SmartHire extracted resume results.">
+    <title>SmartHire | Resume Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=999">
+</head>
+<body>
+    <main class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="/" aria-label="SmartHire home">
+                <span class="brand-mark" aria-hidden="true">S</span>
+                <span>
+                    <span class="brand-name">SMART HIRE</span>
+                    <span class="brand-caption">RESUME INTELLIGENCE</span>
+                </span>
+            </a>
+            <span class="header-pill"><span class="status-dot"></span> Processing complete</span>
+        </header>
+
+        <section class="result-hero">
+            <div>
+                <span class="eyebrow">Resume analysis result</span>
+                <h1>Candidate overview</h1>
+                <p>File: {{ filename }}</p>
+            </div>
+            <span class="file-type-pill">{{ file_type }} DOCUMENT</span>
+        </section>
+
+        <div class="result-grid">
+            <section class="card">
+                <h2>Candidate information</h2>
+                <dl class="info-list">
+                    {% for key, value in resume_data.items() %}
+                        {% if key|lower in ['name', 'email', 'phone', 'address', 'location', 'linkedin', 'github', 'website', 'portfolio'] %}
+                        <div class="info-row">
+                            <dt>{{ key | replace('_', ' ') | title }}</dt>
+                            <dd>
+                                {% if value is mapping %}
+                                    {% for subkey, subvalue in value.items() %}
+                                        {{ subkey | replace('_', ' ') | title }}: {{ subvalue }}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% elif value is sequence and value is not string %}
+                                    {{ value | join(', ') if value else 'Not available' }}
+                                {% else %}
+                                    {{ value if value else 'Not available' }}
+                                {% endif %}
+                            </dd>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </dl>
+            </section>
+
+            <section class="card">
+                <h2>Skills &amp; expertise</h2>
+                <p class="section-kicker">Skills identified by your resume parser</p>
+                <div class="skills">
+                    {% set skills = resume_data.get('skills', []) %}
+                    {% if skills is string %}
+                        {% set skills = skills.split(',') %}
+                    {% endif %}
+                    {% if skills %}
+                        {% for skill in skills %}
+                            <span class="skill">{{ skill }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <p>No skills detected by the current parser.</p>
+                    {% endif %}
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Education</h2>
+                <p class="section-kicker">Academic details extracted from the resume</p>
+                <div class="education">
+                    {% set education = resume_data.get('education', []) %}
+                    {% if education is string %}
+                        {% set education = [education] if education else [] %}
+                    {% endif %}
+                    {% if education %}
+                        {% for item in education %}
+                            <div class="education-item">
+                                {% if item is mapping %}
+                                    {% for subkey, subvalue in item.items() %}
+                                        <strong>{{ subkey | replace('_', ' ') | title }}:</strong> {{ subvalue }}{% if not loop.last %}<br>{% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    {{ item }}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="education-item">Education information was not detected.</div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Experience</h2>
+                <p class="section-kicker">Work history identified by your parser</p>
+                <div class="text-box">{% set experience = resume_data.get('experience', 'Experience information was not detected.') %}{% if experience is mapping %}{% for key, value in experience.items() %}{{ key | replace('_', ' ') | title }}: {{ value }}
+{% endfor %}{% elif experience is sequence and experience is not string %}{% for item in experience %}• {{ item }}
+{% endfor %}{% else %}{{ experience if experience else 'Experience information was not detected.' }}{% endif %}</div>
+            </section>
+        </div>
+
+        <section class="resume-section">
+            <h2>Complete extracted resume details</h2>
+            <p class="resume-description">
+                This table is generated from the fields returned by your resume parser.
+            </p>
+
+            <div class="resume-table-container">
+                <table class="resume-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Field</th>
+                            <th scope="col">Extracted information</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, value in resume_data.items() %}
+                        <tr>
+                            <td>{{ key | replace('_', ' ') | title }}</td>
+                            <td>
+                                {% if value is mapping %}
+                                    {% for subkey, subvalue in value.items() %}
+                                        <strong>{{ subkey | replace('_', ' ') | title }}:</strong>
+                                        {{ subvalue }}{% if not loop.last %}<br>{% endif %}
+                                    {% endfor %}
+                                {% elif value is sequence and value is not string %}
+                                    {% if value %}
+                                    <ul>
+                                        {% for item in value %}
+                                        <li>
+                                            {% if item is mapping %}
+                                                {% for subkey, subvalue in item.items() %}
+                                                    <strong>{{ subkey | replace('_', ' ') | title }}:</strong>
+                                                    {{ subvalue }}{% if not loop.last %}; {% endif %}
+                                                {% endfor %}
+                                            {% else %}
+                                                {{ item }}
+                                            {% endif %}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% else %}
+                                        Not available
+                                    {% endif %}
+                                {% else %}
+                                    {{ value if value else 'Not available' }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="2">No candidate information was extracted.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <details class="raw-resume">
+                <summary>View complete cleaned resume text</summary>
+                <pre>{{ cleaned_text }}</pre>
+            </details>
+        </section>
+
+        <div class="button-container">
+            <a href="{{ url_for('home') }}" class="back-button">
+                <span aria-hidden="true">←</span> Upload another resume
+            </a>
+        </div>
+
+        <footer class="site-footer">
+            SmartHire · Resume Screening System
+        </footer>
+    </main>
+</body>
+</html>
