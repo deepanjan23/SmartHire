@@ -1,8 +1,10 @@
 import logging
 import uuid
+import webbrowser
+from threading import Timer
 from pathlib import Path
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from werkzeug.exceptions import RequestEntityTooLarge
 from werkzeug.utils import secure_filename
 
@@ -87,9 +89,23 @@ def render_home_error(message, status_code=400):
 
 @app.route("/", methods=["GET"])
 def home():
-    return render_template("index.html")
+    return redirect(url_for("login"))
 
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        return "Login form submitted. Authentication is not configured yet."
+
+    return render_template("login.html")
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        return "Registration form submitted. Registration is not configured yet."
+
+    return render_template("register.html")
 # =====================================================
 # UPLOAD AND PROCESS RESUME
 # =====================================================
@@ -234,4 +250,9 @@ def handle_large_file(error):
 # =====================================================
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    Timer(
+        1.5,
+        lambda: webbrowser.open("http://127.0.0.1:5000/login")
+    ).start()
+
+    app.run(debug=True, use_reloader=False)
