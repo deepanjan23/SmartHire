@@ -1,0 +1,338 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#101936">
+
+    <meta name="description"
+          content="SmartHire AI-powered resume screening and candidate intelligence platform.">
+
+    <title>SmartHire | Resume Intelligence</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}?v=1000">
+
+</head>
+
+<body>
+
+<main class="page-shell">
+
+    <!-- HEADER -->
+    <header class="site-header">
+
+        <a class="brand" href="/" aria-label="SmartHire home">
+
+            <span class="brand-mark">S</span>
+
+            <span class="brand-text">
+                <span class="brand-name">SMART HIRE</span>
+                <span class="brand-caption">AI RESUME INTELLIGENCE</span>
+            </span>
+
+        </a>
+
+        <nav class="header-navigation">
+
+            <a href="{{ url_for('home') }}" class="nav-link">
+                Home
+            </a>
+
+            <a href="{{ url_for('login') }}" class="nav-link">
+                Login
+            </a>
+
+            <a href="{{ url_for('register') }}" class="nav-button">
+                Get Started
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <span class="eyebrow">
+                <span class="status-dot"></span>
+                INTELLIGENT RECRUITMENT TECHNOLOGY
+            </span>
+
+            <h1>
+                Discover talent.<br>
+                <span>Unlock potential.</span>
+            </h1>
+
+            <p class="hero-description">
+
+                Transform resumes into meaningful candidate insights.
+                SmartHire uses Natural Language Processing to extract,
+                organize and understand candidate information.
+
+            </p>
+
+            <div class="hero-features">
+
+                <span class="hero-feature">PDF & DOCX Support</span>
+
+                <span class="hero-feature">NLP Processing</span>
+
+                <span class="hero-feature">Candidate Intelligence</span>
+
+            </div>
+
+        </div>
+
+        <div class="hero-decoration" aria-hidden="true">
+
+            <div class="decoration-circle"></div>
+
+            <div class="decoration-card">
+                <span class="decoration-icon">✦</span>
+                <span>SMART ANALYSIS</span>
+                <strong>Skills. Experience. Potential.</strong>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- MAIN WORKSPACE -->
+    <section class="upload-layout">
+
+
+        <!-- RESUME UPLOAD PANEL -->
+        <section class="panel upload-panel">
+
+            <div class="panel-top">
+
+                <div>
+                    <span class="section-label">STEP 01</span>
+
+                    <h2 class="panel-heading">
+                        Upload a resume
+                    </h2>
+
+                    <p class="panel-description">
+                        Start by uploading a candidate's resume.
+                    </p>
+                </div>
+
+                <span class="panel-icon">↑</span>
+
+            </div>
+
+
+            <!-- ERROR MESSAGE -->
+            {% if error %}
+
+            <div class="error-message" role="alert">
+                {{ error }}
+            </div>
+
+            {% endif %}
+
+
+            <!-- UPLOAD FORM -->
+            <form action="{{ url_for('upload_page') }}"
+                  method="POST"
+                  enctype="multipart/form-data">
+
+                <div class="upload-box">
+
+                    <div class="upload-icon">
+                        ↑
+                    </div>
+
+                    <h3>
+                        Drop your resume here
+                    </h3>
+
+                    <p>
+                        Or browse files from your computer
+                    </p>
+
+                    <label for="resume" class="upload-label">
+                        Select Resume
+                    </label>
+
+                    <input
+                        id="resume"
+                        class="file-input"
+                        type="file"
+                        name="resume"
+                        accept=".pdf,.docx"
+                        aria-describedby="file-help"
+                        required
+                    >
+
+                    <div id="selected-file"
+                         class="selected-file"
+                         aria-live="polite">
+                    </div>
+
+
+                    <button class="primary-button" type="submit">
+
+                        <span>Analyze Resume</span>
+
+                        <span aria-hidden="true">→</span>
+
+                    </button>
+
+
+                    <span id="file-help" class="supported">
+
+                        PDF or DOCX · Maximum file size: 10 MB
+
+                    </span>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- HOW IT WORKS -->
+        <aside class="panel workflow-panel">
+
+            <span class="section-label">
+                YOUR WORKFLOW
+            </span>
+
+            <h2 class="panel-heading">
+                How SmartHire works
+            </h2>
+
+            <p class="panel-description">
+
+                From raw resume documents to structured candidate information.
+
+            </p>
+
+
+            <ol class="steps-list">
+
+                <li>
+
+                    <span class="step-number">01</span>
+
+                    <span>
+                        <strong>Upload Resume</strong>
+
+                        Select a candidate's PDF or DOCX document.
+                    </span>
+
+                </li>
+
+
+                <li>
+
+                    <span class="step-number">02</span>
+
+                    <span>
+                        <strong>Extract Information</strong>
+
+                        NLP processes the resume and identifies candidate details.
+                    </span>
+
+                </li>
+
+
+                <li>
+
+                    <span class="step-number">03</span>
+
+                    <span>
+                        <strong>Analyze Candidate</strong>
+
+                        Organize skills, education and professional experience.
+                    </span>
+
+                </li>
+
+
+                <li>
+
+                    <span class="step-number">04</span>
+
+                    <span>
+                        <strong>View Results</strong>
+
+                        Review the extracted candidate information.
+                    </span>
+
+                </li>
+
+            </ol>
+
+
+            <div class="privacy-note">
+
+                <strong>Important:</strong>
+
+                SmartHire currently extracts text from supported documents.
+                Scanned PDFs may require additional OCR functionality.
+
+            </div>
+
+        </aside>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+
+        <span>SMART HIRE</span>
+
+        <span>Your Skills. Your Potential. Your Next Opportunity.</span>
+
+        <span>Resume Intelligence Platform</span>
+
+    </footer>
+
+</main>
+
+
+<!-- FILE SELECTION SCRIPT -->
+<script>
+const resumeInput = document.getElementById("resume");
+const selectedFile = document.getElementById("selected-file");
+
+resumeInput.addEventListener("change", function () {
+    const file = this.files[0];
+
+    if (!file) {
+        selectedFile.textContent = "";
+        return;
+    }
+
+    const extension = file.name.split(".").pop().toLowerCase();
+
+    if (!["pdf", "docx"].includes(extension)) {
+        selectedFile.textContent = "Please select a PDF or DOCX file.";
+        this.value = "";
+        return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+        selectedFile.textContent = "File exceeds the 10 MB limit.";
+        this.value = "";
+        return;
+    }
+
+    selectedFile.textContent = "Selected: " + file.name;
+});
+</script>
+</body>
+</html>

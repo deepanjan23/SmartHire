@@ -1,0 +1,7 @@
+Flask
+PyPDF2
+python-docx
+nltk==3.10.2
+Werkzeug
+PyPDF2
+
