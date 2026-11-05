@@ -1,0 +1,25 @@
+SMART HIRE - RESUME DATA
+========================================
+
+Original filename: SumitaCVUpdated.pdf
+File type: PDF
+
+CANDIDATE INFORMATION
+------------------------------
+name: SUMITA PATRA
+email: Not Found
+phone: 9002727806
+skills: ['C']
+education: ['Diploma', 'Higher Secondary', 'Secondary']
+experience: STAFF NURSE | AIG HOSPITALS                                                                                (Dec 2022 – Present)
+- Provide daily nursing care to in -patients including monitoring vital signs and administering medications
+- Assist doctors during procedures and maintain patient records
+- Educate patients and families on post -discharge care
+- Ensure infection control and hospital protocol compliance
+-Staff Nurse in the Endoscopy And ERCP Department at AIG Hospital, assisting in advanced gastrointestinal procedures
+and ensuring high standards of patient care.
+__________________________________________________________________________________________________
+
+CLEANED RESUME TEXT
+------------------------------
+sumita patra address west medinipur india email sumitapatra611 gmail com mobile 9002727806 _______________________________________________________________ ___________________________________ profile dedicated compassionate registered nurse gnm 2 year clinical experience skilled patient care medication administration health education focused ensuring patient safety comfort __________________________________________________________________________________________ education guru school nursing diploma general nursing midwifery gnm 72 4 approx 7 2cgpa bengaluru india apr 2021 oct 2022 sauri bholanath vidyamandir w b b e higher secondary class xii 60 west medinipur india 2019 sauri bholanath vidyamandir w b b e secondary class x 37 57 west medinipur india 2017 __________________________________________________________________________________________ skill summary patient care medication administration infection control vital sign monitoring health education team collaboration documentation reporting emergency response __________________________________________________________________________________________________ work experience staff nurse aig hospital dec 2022 present provide daily nursing care patient including monitoring vital sign administering medication assist doctor procedure maintain patient record educate patient family post discharge care ensure infection control hospital protocol compliance staff nurse endoscopy ercp department aig hospital assisting advanced gastrointestinal procedure ensuring high standard patient care __________________________________________________________________________________________________ internship intern nurse victoria hospital oct 2022 completed clinical rotation multiple department assisted senior nurse patient care documentation gained experience emergency general ward operation _____________________________________________________________________________ language english bengali hindi

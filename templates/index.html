@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101936">
+    <meta name="description" content="SmartHire resume screening system for extracting and organizing candidate information.">
+    <title>SmartHire | Resume Screening</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=999">
+</head>
+<body>
+    <main class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="/" aria-label="SmartHire home">
+                <span class="brand-mark" aria-hidden="true">S</span>
+                <span>
+                    <span class="brand-name">SMART HIRE</span>
+                    <span class="brand-caption">RESUME INTELLIGENCE</span>
+                </span>
+            </a>
+            <span class="header-pill"><span class="status-dot"></span> Resume screening workspace</span>
+        </header>
+
+        <section class="hero">
+            <div class="hero-content">
+                <span class="eyebrow">Smarter screening starts here</span>
+                <h1>Meet your next opportunity with <span>clarity.</span></h1>
+                <p class="hero-description">
+                    Upload a resume and organize candidate details, skills, education,
+                    and experience into a clean, readable view.
+                </p>
+                <div class="hero-features" aria-label="Supported features">
+                    <span class="hero-feature">PDF &amp; DOCX</span>
+                    <span class="hero-feature">Candidate details</span>
+                    <span class="hero-feature">Skills &amp; education</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="upload-layout">
+            <section class="panel">
+                <h2 class="panel-heading">Upload a resume</h2>
+                <p class="panel-description">
+                    Choose a candidate's resume to begin extracting information.
+                </p>
+
+                {% if error %}
+                <div class="error-message" role="alert">{{ error }}</div>
+                {% endif %}
+
+                <form action="{{ url_for('upload_resume') }}"
+                      method="POST"
+                      enctype="multipart/form-data">
+                    <div class="upload-box">
+                        <div class="upload-icon" aria-hidden="true">↑</div>
+                        <h3>Choose your resume file</h3>
+                        <p>Use a text-based PDF or a Microsoft Word document.</p>
+
+                        <label for="resume" class="upload-label">Resume file</label>
+                        <input
+                            id="resume"
+                            class="file-input"
+                            type="file"
+                            name="resume"
+                            accept=".pdf,.docx"
+                            title="Choose a PDF or DOCX resume"
+                            aria-describedby="file-help"
+                            required
+                        >
+
+                        <button class="primary-button" type="submit">
+                            <span>Analyze resume</span>
+                            <span aria-hidden="true">→</span>
+                        </button>
+
+                        <span id="file-help" class="supported">
+                            Supported: PDF and DOCX · Maximum size: 10 MB
+                        </span>
+                    </div>
+                </form>
+            </section>
+
+            <aside class="panel">
+                <h2 class="panel-heading">How it works</h2>
+                <p class="panel-description">
+                    A simple workflow to turn resume text into organized information.
+                </p>
+
+                <ol class="steps-list">
+                    <li>
+                        <span class="step-number">01</span>
+                        <span>
+                            <strong>Upload a resume</strong>
+                            Select a PDF or DOCX file from your device.
+                        </span>
+                    </li>
+                    <li>
+                        <span class="step-number">02</span>
+                        <span>
+                            <strong>Extract information</strong>
+                            SmartHire reads the available text and processes it.
+                        </span>
+                    </li>
+                    <li>
+                        <span class="step-number">03</span>
+                        <span>
+                            <strong>Review the result</strong>
+                            View the candidate details and extracted resume content.
+                        </span>
+                    </li>
+                </ol>
+
+                <div class="privacy-note">
+                    <strong>Note:</strong> Extraction quality depends on the document.
+                    Scanned PDFs may require OCR, which is not included automatically.
+                </div>
+            </aside>
+        </div>
+
+        <footer class="site-footer">
+            SmartHire · Resume Screening System
+        </footer>
+    </main>
+</body>
+</html>
