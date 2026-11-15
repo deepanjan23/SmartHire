@@ -4,7 +4,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <meta name="theme-color" content="#101936">
 
@@ -14,7 +15,122 @@
     <title>SmartHire | Resume Intelligence</title>
 
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}?v=1000">
+          href="{{ url_for('static', filename='style.css') }}?v=1002">
+
+    <style>
+
+        /* ========================================
+           AUTHENTICATED USER NAVIGATION
+        ======================================== */
+
+        .header-navigation {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+
+            background: linear-gradient(
+                135deg,
+                #ff914d,
+                #ffb066
+            );
+
+            color: #101936;
+            font-size: 17px;
+            font-weight: 800;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+        }
+
+        .welcome-text {
+            color: #101936;
+            font-size: 15px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .logout-form {
+            margin: 0;
+        }
+
+        .logout-button {
+            padding: 11px 18px;
+            border-radius: 12px;
+
+            border: 1px solid #ff914d;
+            background: #ff914d;
+            color: #101936;
+
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+
+            transition: background 0.25s ease,
+                        transform 0.25s ease;
+        }
+
+        .logout-button:hover {
+            background: #ffb066;
+            transform: translateY(-2px);
+        }
+
+        .logout-button:focus-visible {
+            outline: 3px solid #101936;
+            outline-offset: 3px;
+        }
+
+        /* RESPONSIVE NAVIGATION */
+
+        @media (max-width: 700px) {
+
+            .site-header {
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+
+            .header-navigation {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .user-profile {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .welcome-text {
+                font-size: 13px;
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+            }
+
+            .logout-button {
+                padding: 9px 14px;
+            }
+
+        }
+
+    </style>
 
 </head>
 
@@ -22,53 +138,115 @@
 
 <main class="page-shell">
 
-    <!-- HEADER -->
+    <!-- ========================================
+         HEADER
+    ======================================== -->
+
     <header class="site-header">
 
-        <a class="brand" href="/" aria-label="SmartHire home">
+        <a class="brand"
+           href="{{ url_for('home') }}"
+           aria-label="SmartHire home">
 
             <span class="brand-mark">S</span>
 
             <span class="brand-text">
-                <span class="brand-name">SMART HIRE</span>
-                <span class="brand-caption">AI RESUME INTELLIGENCE</span>
+
+                <span class="brand-name">
+                    SMART HIRE
+                </span>
+
+                <span class="brand-caption">
+                    AI RESUME INTELLIGENCE
+                </span>
+
             </span>
 
         </a>
 
-        <nav class="header-navigation">
 
-            <a href="{{ url_for('home') }}" class="nav-link">
+        <!-- AUTHENTICATED USER NAVIGATION -->
+
+        <nav class="header-navigation"
+             aria-label="Main navigation">
+
+            <a href="{{ url_for('home') }}"
+               class="nav-link">
                 Home
             </a>
 
-            <a href="{{ url_for('login') }}" class="nav-link">
-                Login
-            </a>
+            <div class="user-profile">
 
-            <a href="{{ url_for('register') }}" class="nav-button">
-                Get Started
-            </a>
+                <!-- USER AVATAR -->
+
+                <span class="user-avatar"
+                      aria-hidden="true">
+
+                    {{ current_user.full_name[0] | upper }}
+
+                </span>
+
+
+                <!-- DYNAMIC REGISTERED NAME -->
+
+                <span class="welcome-text">
+
+                    Welcome, {{ current_user.full_name }}
+
+                </span>
+
+
+                <!-- LOGOUT -->
+
+                <form
+                    action="{{ url_for('logout') }}"
+                    method="POST"
+                    class="logout-form">
+
+                    <button
+                        type="submit"
+                        class="logout-button">
+
+                        Logout
+
+                    </button>
+
+                </form>
+
+            </div>
 
         </nav>
 
     </header>
 
 
-    <!-- HERO SECTION -->
+    <!-- ========================================
+         HERO SECTION
+    ======================================== -->
+
     <section class="hero">
 
         <div class="hero-content">
 
             <span class="eyebrow">
+
                 <span class="status-dot"></span>
+
                 INTELLIGENT RECRUITMENT TECHNOLOGY
+
             </span>
 
+
             <h1>
+
                 Discover talent.<br>
-                <span>Unlock potential.</span>
+
+                <span>
+                    Unlock potential.
+                </span>
+
             </h1>
+
 
             <p class="hero-description">
 
@@ -78,26 +256,45 @@
 
             </p>
 
+
             <div class="hero-features">
 
-                <span class="hero-feature">PDF & DOCX Support</span>
+                <span class="hero-feature">
+                    PDF &amp; DOCX Support
+                </span>
 
-                <span class="hero-feature">NLP Processing</span>
+                <span class="hero-feature">
+                    NLP Processing
+                </span>
 
-                <span class="hero-feature">Candidate Intelligence</span>
+                <span class="hero-feature">
+                    Candidate Intelligence
+                </span>
 
             </div>
 
         </div>
 
-        <div class="hero-decoration" aria-hidden="true">
+
+        <div class="hero-decoration"
+             aria-hidden="true">
 
             <div class="decoration-circle"></div>
 
             <div class="decoration-card">
-                <span class="decoration-icon">✦</span>
-                <span>SMART ANALYSIS</span>
-                <strong>Skills. Experience. Potential.</strong>
+
+                <span class="decoration-icon">
+                    ✦
+                </span>
+
+                <span>
+                    SMART ANALYSIS
+                </span>
+
+                <strong>
+                    Skills. Experience. Potential.
+                </strong>
+
             </div>
 
         </div>
@@ -105,17 +302,26 @@
     </section>
 
 
-    <!-- MAIN WORKSPACE -->
+    <!-- ========================================
+         MAIN WORKSPACE
+    ======================================== -->
+
     <section class="upload-layout">
 
 
-        <!-- RESUME UPLOAD PANEL -->
+        <!-- ====================================
+             RESUME UPLOAD PANEL
+        ==================================== -->
+
         <section class="panel upload-panel">
 
             <div class="panel-top">
 
                 <div>
-                    <span class="section-label">STEP 01</span>
+
+                    <span class="section-label">
+                        STEP 01
+                    </span>
 
                     <h2 class="panel-heading">
                         Upload a resume
@@ -124,27 +330,61 @@
                     <p class="panel-description">
                         Start by uploading a candidate's resume.
                     </p>
+
                 </div>
 
-                <span class="panel-icon">↑</span>
+                <span class="panel-icon">
+                    ↑
+                </span>
 
             </div>
+
+
+            <!-- FLASH MESSAGES -->
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    {% for category, message in messages %}
+
+                        <div
+                            class="error-message"
+                            role="status">
+
+                            {{ message }}
+
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+            {% endwith %}
 
 
             <!-- ERROR MESSAGE -->
+
             {% if error %}
 
-            <div class="error-message" role="alert">
-                {{ error }}
-            </div>
+                <div class="error-message"
+                     role="alert">
+
+                    {{ error }}
+
+                </div>
 
             {% endif %}
 
 
-            <!-- UPLOAD FORM -->
-            <form action="{{ url_for('upload_page') }}"
-                  method="POST"
-                  enctype="multipart/form-data">
+            <!-- ====================================
+                 UPLOAD FORM
+            ==================================== -->
+
+            <form
+                action="{{ url_for('upload_page') }}"
+                method="POST"
+                enctype="multipart/form-data">
 
                 <div class="upload-box">
 
@@ -152,17 +392,25 @@
                         ↑
                     </div>
 
+
                     <h3>
                         Drop your resume here
                     </h3>
+
 
                     <p>
                         Or browse files from your computer
                     </p>
 
-                    <label for="resume" class="upload-label">
+
+                    <label
+                        for="resume"
+                        class="upload-label">
+
                         Select Resume
+
                     </label>
+
 
                     <input
                         id="resume"
@@ -174,22 +422,32 @@
                         required
                     >
 
-                    <div id="selected-file"
-                         class="selected-file"
-                         aria-live="polite">
+
+                    <div
+                        id="selected-file"
+                        class="selected-file"
+                        aria-live="polite">
                     </div>
 
 
-                    <button class="primary-button" type="submit">
+                    <button
+                        class="primary-button"
+                        type="submit">
 
-                        <span>Analyze Resume</span>
+                        <span>
+                            Analyze Resume
+                        </span>
 
-                        <span aria-hidden="true">→</span>
+                        <span aria-hidden="true">
+                            →
+                        </span>
 
                     </button>
 
 
-                    <span id="file-help" class="supported">
+                    <span
+                        id="file-help"
+                        class="supported">
 
                         PDF or DOCX · Maximum file size: 10 MB
 
@@ -202,73 +460,113 @@
         </section>
 
 
-        <!-- HOW IT WORKS -->
+        <!-- ====================================
+             HOW SMART HIRE WORKS
+        ==================================== -->
+
         <aside class="panel workflow-panel">
 
             <span class="section-label">
                 YOUR WORKFLOW
             </span>
 
+
             <h2 class="panel-heading">
                 How SmartHire works
             </h2>
 
+
             <p class="panel-description">
 
-                From raw resume documents to structured candidate information.
+                From raw resume documents to structured
+                candidate information.
 
             </p>
 
 
             <ol class="steps-list">
 
+                <!-- STEP 01 -->
+
                 <li>
 
-                    <span class="step-number">01</span>
+                    <span class="step-number">
+                        01
+                    </span>
 
                     <span>
-                        <strong>Upload Resume</strong>
+
+                        <strong>
+                            Upload Resume
+                        </strong>
 
                         Select a candidate's PDF or DOCX document.
+
                     </span>
 
                 </li>
 
 
+                <!-- STEP 02 -->
+
                 <li>
 
-                    <span class="step-number">02</span>
+                    <span class="step-number">
+                        02
+                    </span>
 
                     <span>
-                        <strong>Extract Information</strong>
 
-                        NLP processes the resume and identifies candidate details.
+                        <strong>
+                            Extract Information
+                        </strong>
+
+                        NLP processes the resume and identifies
+                        candidate details.
+
                     </span>
 
                 </li>
 
 
+                <!-- STEP 03 -->
+
                 <li>
 
-                    <span class="step-number">03</span>
+                    <span class="step-number">
+                        03
+                    </span>
 
                     <span>
-                        <strong>Analyze Candidate</strong>
 
-                        Organize skills, education and professional experience.
+                        <strong>
+                            Analyze Candidate
+                        </strong>
+
+                        Organize skills, education and
+                        professional experience.
+
                     </span>
 
                 </li>
 
 
+                <!-- STEP 04 -->
+
                 <li>
 
-                    <span class="step-number">04</span>
+                    <span class="step-number">
+                        04
+                    </span>
 
                     <span>
-                        <strong>View Results</strong>
+
+                        <strong>
+                            View Results
+                        </strong>
 
                         Review the extracted candidate information.
+
                     </span>
 
                 </li>
@@ -280,8 +578,9 @@
 
                 <strong>Important:</strong>
 
-                SmartHire currently extracts text from supported documents.
-                Scanned PDFs may require additional OCR functionality.
+                SmartHire currently extracts text from supported
+                documents. Scanned PDFs may require additional
+                OCR functionality.
 
             </div>
 
@@ -290,49 +589,92 @@
     </section>
 
 
-    <!-- FOOTER -->
+    <!-- ========================================
+         FOOTER
+    ======================================== -->
+
     <footer class="site-footer">
 
-        <span>SMART HIRE</span>
+        <span>
+            SMART HIRE
+        </span>
 
-        <span>Your Skills. Your Potential. Your Next Opportunity.</span>
+        <span>
+            Your Skills. Your Potential. Your Next Opportunity.
+        </span>
 
-        <span>Resume Intelligence Platform</span>
+        <span>
+            Resume Intelligence Platform
+        </span>
 
     </footer>
 
 </main>
 
 
-<!-- FILE SELECTION SCRIPT -->
+<!-- ========================================
+     FILE SELECTION SCRIPT
+======================================== -->
+
 <script>
-const resumeInput = document.getElementById("resume");
-const selectedFile = document.getElementById("selected-file");
 
-resumeInput.addEventListener("change", function () {
-    const file = this.files[0];
+    const resumeInput =
+        document.getElementById("resume");
 
-    if (!file) {
-        selectedFile.textContent = "";
-        return;
-    }
+    const selectedFile =
+        document.getElementById("selected-file");
 
-    const extension = file.name.split(".").pop().toLowerCase();
+    resumeInput.addEventListener("change", function () {
 
-    if (!["pdf", "docx"].includes(extension)) {
-        selectedFile.textContent = "Please select a PDF or DOCX file.";
-        this.value = "";
-        return;
-    }
+        const file = this.files[0];
 
-    if (file.size > 10 * 1024 * 1024) {
-        selectedFile.textContent = "File exceeds the 10 MB limit.";
-        this.value = "";
-        return;
-    }
+        if (!file) {
 
-    selectedFile.textContent = "Selected: " + file.name;
-});
+            selectedFile.textContent = "";
+            return;
+
+        }
+
+        const extension =
+            file.name.split(".").pop().toLowerCase();
+
+
+        // VALIDATE FILE EXTENSION
+
+        if (!["pdf", "docx"].includes(extension)) {
+
+            selectedFile.textContent =
+                "Please select a PDF or DOCX file.";
+
+            this.value = "";
+
+            return;
+
+        }
+
+
+        // VALIDATE FILE SIZE
+
+        if (file.size > 10 * 1024 * 1024) {
+
+            selectedFile.textContent =
+                "File exceeds the 10 MB limit.";
+
+            this.value = "";
+
+            return;
+
+        }
+
+
+        // DISPLAY SELECTED FILE
+
+        selectedFile.textContent =
+            "Selected: " + file.name;
+
+    });
+
 </script>
+
 </body>
 </html>

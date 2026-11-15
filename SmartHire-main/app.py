@@ -1,13 +1,36 @@
-
 import logging
+import os
+import re
+import secrets
+import sqlite3
 import uuid
 import webbrowser
 
-from threading import Timer
+from datetime import timedelta
 from pathlib import Path
+from threading import Timer
 
-from flask import Flask, render_template, request
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    flash,
+    session
+)
+
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    login_user,
+    login_required,
+    logout_user,
+    current_user
+)
+
 from werkzeug.exceptions import RequestEntityTooLarge
+from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 # =====================================================
@@ -33,13 +56,36 @@ app = Flask(
     static_url_path="/static"
 )
 
-# Maximum upload size: 10 MB
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
-
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
-UPLOAD_FOLDER = BASE_DIR / "resumes"
-OUTPUT_FOLDER = BASE_DIR / "output"
+# Persistent secret key for local desktop sessions.
+# For production deployments, provide a secure environment
+# variable instead of sharing the key across installations.
+
+DATA_DIR = Path.home() / ".smarthire"
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+SECRET_FILE = DATA_DIR / "secret.key"
+
+if not SECRET_FILE.exists():
+    SECRET_FILE.write_text(
+        secrets.token_hex(32),
+        encoding="utf-8"
+    )
+
+app.config["SECRET_KEY"] = os.environ.get(
+    "SMARTHIRE_SECRET_KEY",
+    SECRET_FILE.read_text(encoding="utf-8").strip()
+)
+
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=8)
+
+UPLOAD_FOLDER = DATA_DIR / "resumes"
+OUTPUT_FOLDER = DATA_DIR / "output"
+DATABASE_PATH = DATA_DIR / "users.db"
 
 UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
@@ -47,8 +93,80 @@ OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
 ALLOWED_EXTENSIONS = {".pdf", ".docx"}
 
 logging.basicConfig(level=logging.INFO)
-
 logger = logging.getLogger(__name__)
+
+
+# =====================================================
+# DATABASE CONFIGURATION
+# =====================================================
+
+def get_db_connection():
+    connection = sqlite3.connect(DATABASE_PATH)
+    connection.row_factory = sqlite3.Row
+    return connection
+
+
+def initialize_database():
+    with get_db_connection() as connection:
+        connection.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                full_name TEXT NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+
+initialize_database()
+
+
+# =====================================================
+# FLASK LOGIN CONFIGURATION
+# =====================================================
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+login_manager.login_message = (
+    "Please log in to analyze your resume."
+)
+
+
+class User(UserMixin):
+
+    def __init__(self, id, full_name, email):
+        self.id = str(id)
+        self.full_name = full_name
+        self.email = email
+
+
+@login_manager.user_loader
+def load_user(user_id):
+
+    try:
+        with get_db_connection() as connection:
+            record = connection.execute(
+                """
+                SELECT id, full_name, email
+                FROM users
+                WHERE id = ?
+                """,
+                (int(user_id),)
+            ).fetchone()
+
+    except (ValueError, TypeError):
+        return None
+
+    if record is None:
+        return None
+
+    return User(
+        record["id"],
+        record["full_name"],
+        record["email"]
+    )
 
 
 # =====================================================
@@ -56,25 +174,39 @@ logger = logging.getLogger(__name__)
 # =====================================================
 
 def allowed_file(filename):
-    """Check whether the uploaded file has a supported extension."""
-
+    """Check supported resume extensions."""
     return Path(filename).suffix.lower() in ALLOWED_EXTENSIONS
 
 
-def save_resume_output(filename, file_type, resume_data, cleaned_text):
-    """Save extracted candidate information and cleaned resume text."""
+def save_resume_output(
+    filename,
+    file_type,
+    resume_data,
+    cleaned_text
+):
+    """Save extracted candidate information."""
 
-    output_filename = f"resume_data_{uuid.uuid4().hex}.txt"
+    output_filename = (
+        f"resume_data_{uuid.uuid4().hex}.txt"
+    )
 
     output_path = OUTPUT_FOLDER / output_filename
 
-    with output_path.open("w", encoding="utf-8") as output:
+    with output_path.open(
+        "w",
+        encoding="utf-8"
+    ) as output:
 
         output.write("SMART HIRE - RESUME DATA\n")
         output.write("=" * 40 + "\n\n")
 
-        output.write(f"Original filename: {filename}\n")
-        output.write(f"File type: {file_type}\n\n")
+        output.write(
+            f"Original filename: {filename}\n"
+        )
+
+        output.write(
+            f"File type: {file_type}\n\n"
+        )
 
         output.write("CANDIDATE INFORMATION\n")
         output.write("-" * 30 + "\n")
@@ -91,7 +223,6 @@ def save_resume_output(filename, file_type, resume_data, cleaned_text):
 
 
 def render_home_error(message, status_code=400):
-    """Display an error on the resume upload page."""
 
     return render_template(
         "index.html",
@@ -100,7 +231,7 @@ def render_home_error(message, status_code=400):
 
 
 # =====================================================
-# HOME PAGE - SMART HIRE LANDING PAGE
+# LANDING PAGE
 # =====================================================
 
 @app.route("/", methods=["GET"])
@@ -110,40 +241,211 @@ def home():
 
 
 # =====================================================
-# LOGIN PAGE
-# =====================================================
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-
-    if request.method == "POST":
-
-        # Authentication can be integrated here later.
-        return "Login form submitted. Authentication is not configured yet."
-
-    return render_template("login.html")
-
-
-# =====================================================
 # REGISTRATION PAGE
 # =====================================================
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
+    if current_user.is_authenticated:
+        return redirect(url_for("upload_page"))
+
     if request.method == "POST":
 
-        # User registration can be integrated here later.
-        return "Registration form submitted. Registration is not configured yet."
+        full_name = request.form.get(
+            "full_name", ""
+        ).strip()
+
+        email = request.form.get(
+            "email", ""
+        ).strip().lower()
+
+        password = request.form.get(
+            "password", ""
+        )
+
+        confirm_password = request.form.get(
+            "confirm_password", ""
+        )
+
+        if not all([
+            full_name,
+            email,
+            password,
+            confirm_password
+        ]):
+            flash(
+                "Please complete all registration fields.",
+                "error"
+            )
+            return redirect(url_for("register"))
+
+        if "@" not in email or "." not in email.split("@")[-1]:
+            flash("Enter a valid email address.", "error")
+            return redirect(url_for("register"))
+
+        if len(password) < 8:
+            flash(
+                "Password must contain at least 8 characters.",
+                "error"
+            )
+            return redirect(url_for("register"))
+
+        password_rules = [
+            (r"[A-Z]", "Password must contain an uppercase letter."),
+            (r"[a-z]", "Password must contain a lowercase letter."),
+            (r"[0-9]", "Password must contain a number."),
+            (r"[^A-Za-z0-9\s]", "Password must contain a special character."),
+        ]
+
+        for pattern, message in password_rules:
+            if not re.search(pattern, password):
+                flash(message, "error")
+                return redirect(url_for("register"))
+
+        if re.search(r"\s", password):
+            flash("Password must not contain spaces or whitespace.", "error")
+            return redirect(url_for("register"))
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "error")
+            return redirect(url_for("register"))
+
+        password_hash = generate_password_hash(password)
+
+        try:
+            with get_db_connection() as connection:
+
+                connection.execute(
+                    """
+                    INSERT INTO users (
+                        full_name,
+                        email,
+                        password_hash
+                    )
+                    VALUES (?, ?, ?)
+                    """,
+                    (
+                        full_name,
+                        email,
+                        password_hash
+                    )
+                )
+
+        except sqlite3.IntegrityError:
+
+            flash(
+                "An account with this email already exists.",
+                "error"
+            )
+
+            return redirect(url_for("register"))
+
+        flash(
+            "Account created successfully. Please log in.",
+            "success"
+        )
+
+        return redirect(url_for("login"))
 
     return render_template("register.html")
 
 
 # =====================================================
-# RESUME UPLOAD PAGE
+# LOGIN PAGE
+# =====================================================
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    if current_user.is_authenticated:
+        return redirect(url_for("upload_page"))
+
+    if request.method == "POST":
+
+        email = request.form.get(
+            "email", ""
+        ).strip().lower()
+
+        password = request.form.get(
+            "password", ""
+        )
+
+        if not email or not password:
+            flash(
+                "Please enter your email and password.",
+                "error"
+            )
+            return redirect(url_for("login"))
+
+        with get_db_connection() as connection:
+
+            record = connection.execute(
+                """
+                SELECT *
+                FROM users
+                WHERE email = ?
+                """,
+                (email,)
+            ).fetchone()
+
+        if record is None or not check_password_hash(
+            record["password_hash"],
+            password
+        ):
+
+            flash(
+                "Invalid email or password.",
+                "error"
+            )
+
+            return redirect(url_for("login"))
+
+        user = User(
+            record["id"],
+            record["full_name"],
+            record["email"]
+        )
+
+        login_user(user)
+
+        session.permanent = True
+
+        flash(
+            f"Welcome to SmartHire, {user.full_name}!",
+            "success"
+        )
+
+        # Redirect to resume analysis after login
+        return redirect(url_for("upload_page"))
+
+    return render_template("login.html")
+
+
+# =====================================================
+# LOGOUT
+# =====================================================
+
+@app.route("/logout", methods=["POST"])
+@login_required
+def logout():
+
+    logout_user()
+
+    flash(
+        "You have logged out successfully.",
+        "success"
+    )
+
+    return redirect(url_for("login"))
+
+
+# =====================================================
+# RESUME UPLOAD AND ANALYSIS
 # =====================================================
 
 @app.route("/upload", methods=["GET", "POST"])
+@login_required
 def upload_page():
 
     if request.method == "GET":
@@ -157,13 +459,18 @@ def upload_page():
 
     uploaded_file = request.files["resume"]
 
-    if not uploaded_file.filename or not uploaded_file.filename.strip():
+    if (
+        not uploaded_file.filename
+        or not uploaded_file.filename.strip()
+    ):
 
         return render_home_error(
             "No file selected. Please choose a PDF or DOCX resume."
         )
 
-    original_filename = secure_filename(uploaded_file.filename)
+    original_filename = secure_filename(
+        uploaded_file.filename
+    )
 
     if not original_filename:
 
@@ -177,12 +484,17 @@ def upload_page():
             "Unsupported file format. Please upload a PDF or DOCX file."
         )
 
-    extension = Path(original_filename).suffix.lower()
+    extension = Path(
+        original_filename
+    ).suffix.lower()
 
-    file_type = "PDF" if extension == ".pdf" else "DOCX"
+    file_type = (
+        "PDF" if extension == ".pdf" else "DOCX"
+    )
 
-    # Generate unique filename to prevent overwriting.
-    stored_filename = f"{uuid.uuid4().hex}{extension}"
+    stored_filename = (
+        f"{uuid.uuid4().hex}{extension}"
+    )
 
     file_path = UPLOAD_FOLDER / stored_filename
 
@@ -192,9 +504,10 @@ def upload_page():
 
         uploaded_file.save(str(file_path))
 
-        if not file_path.is_file() or file_path.stat().st_size == 0:
-
-            file_path.unlink(missing_ok=True)
+        if (
+            not file_path.is_file()
+            or file_path.stat().st_size == 0
+        ):
 
             return render_home_error(
                 "The uploaded file is empty. Please choose another file."
@@ -204,17 +517,25 @@ def upload_page():
 
         if extension == ".pdf":
 
-            extracted_text = extract_text_from_pdf(str(file_path))
+            extracted_text = extract_text_from_pdf(
+                str(file_path)
+            )
 
         else:
 
-            extracted_text = extract_text_from_docx(str(file_path))
+            extracted_text = extract_text_from_docx(
+                str(file_path)
+            )
 
-        if not isinstance(extracted_text, str) or not extracted_text.strip():
+        if (
+            not isinstance(extracted_text, str)
+            or not extracted_text.strip()
+        ):
 
             return render_home_error(
-                "No readable text was found. Please upload a text-based "
-                "PDF or DOCX. Scanned PDFs may require OCR."
+                "No readable text was found. "
+                "Please upload a text-based PDF or DOCX. "
+                "Scanned PDFs may require OCR."
             )
 
         # STEP 3: EXTRACT CANDIDATE INFORMATION
@@ -227,7 +548,7 @@ def upload_page():
                 "The resume parser did not return valid candidate data."
             )
 
-        # STEP 4: CLEAN RESUME TEXT USING NLP
+        # STEP 4: CLEAN RESUME TEXT
 
         cleaned_text = clean_text(extracted_text)
 
@@ -262,7 +583,7 @@ def upload_page():
             output_filename=output_filename
         )
 
-    except Exception as exc:
+    except Exception:
 
         logger.exception(
             "Resume processing failed for %s",
@@ -270,9 +591,13 @@ def upload_page():
         )
 
         return render_home_error(
-            f"Resume processing failed: {exc}",
+            "Resume processing failed. Please check the file and try again.",
             status_code=500
         )
+
+    finally:
+        # Remove temporary uploaded resume after processing
+        file_path.unlink(missing_ok=True)
 
 
 # =====================================================
@@ -281,6 +606,9 @@ def upload_page():
 
 @app.errorhandler(RequestEntityTooLarge)
 def handle_large_file(error):
+
+    if not current_user.is_authenticated:
+        return redirect(url_for("login"))
 
     return render_home_error(
         "File is too large. The maximum allowed size is 10 MB.",
@@ -302,6 +630,8 @@ if __name__ == "__main__":
     ).start()
 
     app.run(
-        debug=True,
+        host="127.0.0.1",
+        port=5000,
+        debug=False,
         use_reloader=False
     )

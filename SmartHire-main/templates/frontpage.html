@@ -36,7 +36,10 @@
             <a href="#how-it-works">How It Works</a>
         </nav>
 
-        <a href="/upload" class="nav-button">Get Started</a>
+        <!-- Redirect to Sign Up -->
+        <a href="{{ url_for('register') }}" class="nav-button">
+            Get Started
+        </a>
 
     </header>
 
@@ -68,11 +71,14 @@
 
             <div class="hero-buttons">
 
-                <a href="/upload" class="primary-button">
+                <!-- Redirect to Sign Up -->
+                <a href="{{ url_for('register') }}"
+                   class="primary-button">
                     Get Started <span>→</span>
                 </a>
 
-                <a href="#how-it-works" class="secondary-button">
+                <a href="#how-it-works"
+                   class="secondary-button">
                     <span class="play-icon">▶</span>
                     Learn More
                 </a>
@@ -155,19 +161,25 @@
         <div class="feature-item">
             <div class="feature-icon">✦</div>
             <h3>AI-Powered Matching</h3>
-            <p>Intelligent resume and job description matching.</p>
+            <p>
+                Intelligent resume and job description matching.
+            </p>
         </div>
 
         <div class="feature-item">
             <div class="feature-icon">↗</div>
             <h3>Smart Ranking</h3>
-            <p>Identify and rank candidates based on skill relevance.</p>
+            <p>
+                Identify and rank candidates based on skill relevance.
+            </p>
         </div>
 
         <div class="feature-item">
             <div class="feature-icon">◆</div>
             <h3>Better Opportunities</h3>
-            <p>Discover skills and opportunities for career growth.</p>
+            <p>
+                Discover skills and opportunities for career growth.
+            </p>
         </div>
 
     </section>
@@ -187,8 +199,12 @@
 
     </section>
 
+
+    <!-- Footer -->
     <footer>
-        <p>© 2026 SmartHire. Your Talent, Our Intelligence.</p>
+        <p>
+            © 2026 SmartHire. Your Talent, Our Intelligence.
+        </p>
     </footer>
 
 </body>
