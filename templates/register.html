@@ -1,14 +1,19 @@
-```html
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <meta name="theme-color" content="#101936">
 
     <title>SmartHire | Student Registration</title>
 
     <style>
+
         * {
             margin: 0;
             padding: 0;
@@ -21,17 +26,21 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #101936, #263f77);
+            background: linear-gradient(
+                135deg,
+                #101936,
+                #263f77
+            );
             padding: 20px;
         }
 
         .register-container {
             width: 100%;
             max-width: 440px;
-            background: white;
+            background: #ffffff;
             padding: 35px;
             border-radius: 16px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
         }
 
         .logo {
@@ -46,6 +55,7 @@
             text-align: center;
             color: #666;
             margin-bottom: 25px;
+            font-size: 14px;
         }
 
         h2 {
@@ -63,6 +73,7 @@
             margin-bottom: 8px;
             font-weight: bold;
             color: #263247;
+            font-size: 14px;
         }
 
         input {
@@ -72,12 +83,85 @@
             border-radius: 8px;
             font-size: 15px;
             outline: none;
+            transition: 0.2s;
         }
 
         input:focus {
             border-color: #4263eb;
-            box-shadow: 0 0 0 3px rgba(66, 99, 235, 0.12);
+            box-shadow:
+                0 0 0 3px rgba(66,99,235,0.12);
         }
+
+        input.valid {
+            border-color: #16a34a;
+        }
+
+        input.invalid {
+            border-color: #dc2626;
+        }
+
+        /* PASSWORD REQUIREMENTS */
+
+        .password-requirements {
+            background: #f4f7fc;
+            border: 1px solid #dce4f2;
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        .password-requirements h4 {
+            color: #101936;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .requirement {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 9px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .requirement:last-child {
+            margin-bottom: 0;
+        }
+
+        .indicator {
+            width: 18px;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        .requirement.valid {
+            color: #15803d;
+        }
+
+        .requirement.invalid {
+            color: #dc2626;
+        }
+
+        /* PASSWORD MATCH MESSAGE */
+
+        .password-message {
+            display: none;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .password-message.error {
+            display: block;
+            color: #dc2626;
+        }
+
+        .password-message.success {
+            display: block;
+            color: #15803d;
+        }
+
+        /* REGISTER BUTTON */
 
         .register-button {
             width: 100%;
@@ -90,15 +174,32 @@
             font-weight: bold;
             cursor: pointer;
             margin-top: 5px;
+            transition: 0.2s;
         }
 
-        .register-button:hover {
+        .register-button:hover:not(:disabled) {
             background: #101936;
         }
+
+        .register-button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* FLASH MESSAGES */
 
         .error-message {
             background: #ffe8e8;
             color: #b42318;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #dcfce7;
+            color: #166534;
             padding: 12px;
             border-radius: 8px;
             margin-bottom: 18px;
@@ -121,6 +222,13 @@
         a:hover {
             text-decoration: underline;
         }
+
+        @media (max-width: 480px) {
+            .register-container {
+                padding: 24px;
+            }
+        }
+
     </style>
 </head>
 
@@ -128,35 +236,77 @@
 
     <div class="register-container">
 
-        <div class="logo">SmartHire</div>
+        <div class="logo">
+            SmartHire
+        </div>
 
-        <p class="subtitle">Smart Resume Screening System</p>
+        <p class="subtitle">
+            Smart Resume Screening System
+        </p>
 
-        <h2>Create Student Account</h2>
+        <h2>
+            Create Student Account
+        </h2>
+
+        <!-- FLASK FLASH MESSAGES -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% for category, message in messages %}
+
+                <div
+                    class="{{ 'success-message' if category == 'success' else 'error-message' }}"
+                    role="alert"
+                >
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
 
         {% if error %}
-            <div class="error-message">
+
+            <div class="error-message" role="alert">
                 {{ error }}
             </div>
+
         {% endif %}
 
-        <form action="{{ url_for('register') }}" method="POST">
+        <!-- REGISTRATION FORM -->
+
+        <form
+            id="registrationForm"
+            action="{{ url_for('register') }}"
+            method="POST"
+        >
+
+            <!-- FULL NAME -->
 
             <div class="form-group">
-                <label for="name">Full Name</label>
+
+                <label for="full_name">
+                    Full Name
+                </label>
 
                 <input
                     type="text"
-                    id="name"
-                    name="name"
+                    id="full_name"
+                    name="full_name"
                     placeholder="Enter your full name"
                     autocomplete="name"
                     required
                 >
+
             </div>
 
+            <!-- EMAIL -->
+
             <div class="form-group">
-                <label for="email">Email Address</label>
+
+                <label for="email">
+                    Email Address
+                </label>
 
                 <input
                     type="email"
@@ -166,48 +316,370 @@
                     autocomplete="email"
                     required
                 >
+
             </div>
 
+            <!-- PASSWORD -->
+
             <div class="form-group">
-                <label for="password">Password</label>
+
+                <label for="password">
+                    Password
+                </label>
 
                 <input
                     type="password"
                     id="password"
                     name="password"
-                    placeholder="Create a password (minimum 8 characters)"
+                    placeholder="Create a strong password"
                     minlength="8"
                     autocomplete="new-password"
+                    aria-describedby="passwordRequirements"
                     required
                 >
+
+                <!-- PASSWORD REQUIREMENTS BOX -->
+
+                <div
+                    class="password-requirements"
+                    id="passwordRequirements"
+                >
+
+                    <h4>
+                        Your password must include:
+                    </h4>
+
+                    <div class="requirement" id="length">
+                        <span class="indicator">○</span>
+                        At least 8 characters
+                    </div>
+
+                    <div class="requirement" id="uppercase">
+                        <span class="indicator">○</span>
+                        One uppercase letter (A-Z)
+                    </div>
+
+                    <div class="requirement" id="lowercase">
+                        <span class="indicator">○</span>
+                        One lowercase letter (a-z)
+                    </div>
+
+                    <div class="requirement" id="number">
+                        <span class="indicator">○</span>
+                        One number (0-9)
+                    </div>
+
+                    <div class="requirement" id="special">
+                        <span class="indicator">○</span>
+                        One special character (!@#$...)
+                    </div>
+
+                    <div class="requirement" id="noSpace">
+                        <span class="indicator">○</span>
+                        No spaces or whitespace
+                    </div>
+
+                </div>
+
             </div>
 
+            <!-- CONFIRM PASSWORD -->
+
             <div class="form-group">
-                <label for="confirm_password">Confirm Password</label>
+
+                <label for="confirm_password">
+                    Confirm Password
+                </label>
 
                 <input
                     type="password"
                     id="confirm_password"
                     name="confirm_password"
                     placeholder="Enter your password again"
-                    minlength="8"
                     autocomplete="new-password"
+                    aria-describedby="passwordMatchMessage"
                     required
                 >
+
+                <p
+                    id="passwordMatchMessage"
+                    class="password-message"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+
             </div>
 
-            <button type="submit" class="register-button">
+            <!-- CREATE ACCOUNT BUTTON -->
+
+            <button
+                type="submit"
+                id="registerButton"
+                class="register-button"
+                disabled
+            >
                 Create Account
             </button>
 
         </form>
 
+        <!-- LOGIN LINK -->
+
         <div class="login-link">
+
             Already have an account?
-            <a href="{{ url_for('login') }}">Login here</a>
+
+            <a href="{{ url_for('login') }}">
+                Login here
+            </a>
+
         </div>
 
     </div>
+
+    <!-- REAL-TIME VALIDATION -->
+
+    <script>
+
+        const passwordInput =
+            document.getElementById("password");
+
+        const confirmInput =
+            document.getElementById("confirm_password");
+
+        const registerButton =
+            document.getElementById("registerButton");
+
+        const matchMessage =
+            document.getElementById("passwordMatchMessage");
+
+        const registrationForm =
+            document.getElementById("registrationForm");
+
+        const fullNameInput =
+            document.getElementById("full_name");
+
+        const emailInput =
+            document.getElementById("email");
+
+
+        // PASSWORD VALIDATION RULES
+
+        const requirements = {
+
+            length: value =>
+                value.length >= 8,
+
+            uppercase: value =>
+                /[A-Z]/.test(value),
+
+            lowercase: value =>
+                /[a-z]/.test(value),
+
+            number: value =>
+                /[0-9]/.test(value),
+
+            special: value =>
+                /[^A-Za-z0-9\s]/.test(value),
+
+            noSpace: value =>
+                !/\s/.test(value)
+
+        };
+
+
+        // UPDATE REQUIREMENT INDICATORS
+
+        function updateRequirement(id, valid) {
+
+            const element =
+                document.getElementById(id);
+
+            const indicator =
+                element.querySelector(".indicator");
+
+            element.classList.remove(
+                "valid",
+                "invalid"
+            );
+
+            if (!passwordInput.value) {
+
+                indicator.textContent = "○";
+                return;
+            }
+
+            element.classList.add(
+                valid ? "valid" : "invalid"
+            );
+
+            indicator.textContent =
+                valid ? "✓" : "✕";
+
+        }
+
+
+        // VALIDATE PASSWORD STRENGTH
+
+        function validatePassword() {
+
+            const password =
+                passwordInput.value;
+
+            let allValid = true;
+
+            for (
+                const [id, test]
+                of Object.entries(requirements)
+            ) {
+
+                const valid = test(password);
+
+                updateRequirement(id, valid);
+
+                if (!valid) {
+                    allValid = false;
+                }
+
+            }
+
+            passwordInput.classList.toggle(
+                "valid",
+                allValid
+            );
+
+            passwordInput.classList.toggle(
+                "invalid",
+                password.length > 0 && !allValid
+            );
+
+            return allValid;
+
+        }
+
+
+        // VALIDATE CONFIRM PASSWORD
+
+        function validateMatch() {
+
+            const password =
+                passwordInput.value;
+
+            const confirmation =
+                confirmInput.value;
+
+            matchMessage.className =
+                "password-message";
+
+            confirmInput.classList.remove(
+                "valid",
+                "invalid"
+            );
+
+            if (!confirmation) {
+
+                matchMessage.textContent = "";
+                return false;
+
+            }
+
+            if (password !== confirmation) {
+
+                matchMessage.textContent =
+                    "✕ Passwords do not match";
+
+                matchMessage.classList.add("error");
+
+                confirmInput.classList.add("invalid");
+
+                return false;
+
+            }
+
+            matchMessage.textContent =
+                "✓ Passwords match";
+
+            matchMessage.classList.add("success");
+
+            confirmInput.classList.add("valid");
+
+            return true;
+
+        }
+
+
+        // VALIDATE ENTIRE FORM
+
+        function validateForm() {
+
+            const passwordValid =
+                validatePassword();
+
+            const passwordsMatch =
+                validateMatch();
+
+            const nameValid =
+                fullNameInput.value.trim().length > 0;
+
+            const emailValid =
+                emailInput.checkValidity();
+
+            registerButton.disabled = !(
+                passwordValid &&
+                passwordsMatch &&
+                nameValid &&
+                emailValid
+            );
+
+        }
+
+
+        // LIVE VALIDATION EVENTS
+
+        passwordInput.addEventListener(
+            "input",
+            validateForm
+        );
+
+        confirmInput.addEventListener(
+            "input",
+            validateForm
+        );
+
+        fullNameInput.addEventListener(
+            "input",
+            validateForm
+        );
+
+        emailInput.addEventListener(
+            "input",
+            validateForm
+        );
+
+
+        // PREVENT INVALID SUBMISSION
+
+        registrationForm.addEventListener(
+            "submit",
+            function(event) {
+
+                validateForm();
+
+                if (registerButton.disabled) {
+
+                    event.preventDefault();
+
+                }
+
+            }
+        );
+
+
+        // INITIAL VALIDATION
+
+        validateForm();
+
+    </script>
 
 </body>
 </html>

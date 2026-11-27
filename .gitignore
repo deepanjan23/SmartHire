@@ -1,2 +1,8 @@
-
-SmartHire-main.zip
+.env
+.venv/
+__pycache__/
+*.py[cod]
+build/
+dist/
+output/
+resumes/

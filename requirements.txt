@@ -1,5 +1,9 @@
 Flask
+Flask-Login
+Flask-SQLAlchemy
+psycopg[binary]
+python-dotenv
 PyPDF2
 python-docx
-pywebview
-werkzeug
+nltk==3.10.2
+Werkzeug
